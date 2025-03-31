@@ -1,0 +1,35 @@
+{
+  "name": "markdown-html-converter",
+  "version": "1.0.0",
+  "description": "A Markdown to HTML converter with tests",
+  "main": "src/converter.js",
+  "scripts": {
+    "test": "jest"
+  },
+  "bin": {
+    "mdtohtml": "./bin/cli.js"
+  },
+  "exports": {
+  ".": {
+    "require": "./src/converter.js",
+    "import": "./src/converter.mjs"
+  }
+},
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "marked": "^4.3.0",
+    "sanitize-html": "^2.7.3",
+    "winston": "^3.17.0"
+  },
+  "devDependencies": {
+    "jest": "^29.5.0"
+  },
+  "jest": {
+    "testMatch": [
+      "**/test/**/*.test.js"
+    ]
+  }
+}
