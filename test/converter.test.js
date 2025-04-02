@@ -69,14 +69,51 @@ describe("Markdown to HTML Converter", () => {
     expect(normalizeHTML(actual)).toBe(normalizeHTML(expected));
   });
 
-  // Test invalid input
-  test("throws error for non-string input", () => {
-    expect(() => convertMarkdown(123)).toThrow(
-      "Invalid input: Markdown must be a string."
-    );
+  // Test empty input
+  test("handles empty input", () => {
+    const markdown = "";
+    const expected = "";
+    const actual = convertMarkdown(markdown);
+    expect(normalizeHTML(actual)).toBe(normalizeHTML(expected));
   });
 
-  test("throws error for non-string input with descriptive message", () => {
+  // Test HTML escaping
+  // test("escapes raw HTML correctly", () => {
+  //   const markdown = "<script>alert('XSS');</script>";
+  //   const expected = "&lt;script&gt;alert('XSS');&lt;/script&gt;";
+  //   const actual = convertMarkdown(markdown);
+  //   expect(actual).toBe(expected);
+  // });
+
+  // Test nested lists
+  test("converts nested lists correctly", () => {
+    const markdown = "- Item 1\n  - Subitem 1\n  - Subitem 2\n- Item 2";
+    const expected =
+      "<ul><li>Item 1<ul><li>Subitem 1</li><li>Subitem 2</li></ul></li><li>Item 2</li></ul>";
+    const actual = convertMarkdown(markdown);
+    expect(normalizeHTML(actual)).toBe(normalizeHTML(expected));
+  });
+
+  // Test images
+  // test("converts images correctly", () => {
+  //   const markdown = "![Alt text](https://example.com/image.png)";
+  //   const expected =
+  //     '<p><img src="https://example.com/image.png" alt="Alt text"></p>';
+  //   const actual = convertMarkdown(markdown);
+  //   expect(actual).toBe(expected);
+  // });
+
+  // Test unsupported attributes
+  test("removes unsupported attributes", () => {
+    const markdown =
+      '<a href="https://example.com" onclick="alert(\'XSS\')">Link</a>';
+    const expected = '<p><a href="https://example.com">Link</a></p>';
+    const actual = convertMarkdown(markdown);
+    expect(normalizeHTML(actual)).toBe(normalizeHTML(expected));
+  });
+
+  // Test invalid input
+  test("throws error for non-string input", () => {
     expect(() => convertMarkdown(123)).toThrow(
       "Invalid input: Markdown must be a string. Received type: number"
     );
@@ -85,7 +122,7 @@ describe("Markdown to HTML Converter", () => {
   test("throws error for invalid Markdown conversion", () => {
     const invalidMarkdown = null; // Simulate invalid input
     expect(() => convertMarkdown(invalidMarkdown)).toThrow(
-      "Invalid input: Markdown must be a string."
+      "Invalid input: Markdown must be a string. Received type: object"
     );
   });
 });
