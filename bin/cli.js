@@ -7,7 +7,7 @@ const convertMarkdown = require("../src/converter");
 
 // Configure Winston logger
 const logger = winston.createLogger({
-  level: "info",
+  level: "error", // Log only errors by default
   format: winston.format.combine(
     winston.format.timestamp(),
     winston.format.printf(({ timestamp, level, message }) => {
@@ -16,7 +16,7 @@ const logger = winston.createLogger({
   ),
   transports: [
     new winston.transports.Console(),
-    new winston.transports.File({ filename: "logs/app.log" }),
+    new winston.transports.File({ filename: "logs/errors.log" }),
   ],
 });
 
@@ -58,7 +58,6 @@ try {
   readMarkdown = inputFile
     ? fs.readFileSync(path.resolve(inputFile), "utf8")
     : fs.readFileSync(0, "utf8"); // Read from stdin
-  logger.info(`Successfully read input from ${inputFile || "stdin"}`);
 } catch (error) {
   logger.error(
     `Failed to read input: ${error.message}. Ensure the file exists and is readable.`
@@ -70,7 +69,6 @@ try {
 let htmlOutput;
 try {
   htmlOutput = convertMarkdown(readMarkdown);
-  logger.info("Markdown successfully converted to HTML.");
 } catch (error) {
   logger.error(`Conversion failed: ${error.message}`);
   process.exit(1);
@@ -80,10 +78,9 @@ try {
 try {
   if (outputFile) {
     fs.writeFileSync(path.resolve(outputFile), htmlOutput, "utf8");
-    logger.info(`Converted HTML saved to ${outputFile}`);
+    console.log(`Converted HTML saved to ${outputFile}`);
   } else {
     console.log(htmlOutput);
-    logger.info("Converted HTML output to stdout.");
   }
 } catch (error) {
   logger.error(
