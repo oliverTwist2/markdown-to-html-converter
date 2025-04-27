@@ -8,6 +8,8 @@ describe("Markdown to HTML Converter", () => {
       .replace(/>\s+</g, "><") // Remove spaces between tags
       .replace(/\s+>/g, ">") // Remove spaces before closing angle bracket
       .replace(/<\s+/g, "<") // Remove spaces after opening angle bracket
+      .replace(/<img([^>]*?)\/?>/g, "<img$1>") // Normalize <img ... /> to <img ...>
+      .replace(/<img([^>]*) >+/g, "<img$1>") // Remove space before > in <img ... >
       .trim(); // Remove leading/trailing whitespace
   };
 
@@ -77,13 +79,13 @@ describe("Markdown to HTML Converter", () => {
     expect(normalizeHTML(actual)).toBe(normalizeHTML(expected));
   });
 
-  // Test HTML escaping
-  // test("escapes raw HTML correctly", () => {
-  //   const markdown = "<script>alert('XSS');</script>";
-  //   const expected = "&lt;script&gt;alert('XSS');&lt;/script&gt;";
-  //   const actual = convertMarkdown(markdown);
-  //   expect(actual).toBe(expected);
-  // });
+  //Test HTML escaping
+  test("escapes raw HTML correctly", () => {
+    const markdown = "<script>alert('XSS');</script>";
+    const expected = "&lt;script&gt;alert('XSS');&lt;/script&gt;";
+    const actual = convertMarkdown(markdown);
+    expect(actual).toBe(expected);
+  });
 
   // Test nested lists
   test("converts nested lists correctly", () => {
@@ -95,13 +97,13 @@ describe("Markdown to HTML Converter", () => {
   });
 
   // Test images
-  // test("converts images correctly", () => {
-  //   const markdown = "![Alt text](https://example.com/image.png)";
-  //   const expected =
-  //     '<p><img src="https://example.com/image.png" alt="Alt text"></p>';
-  //   const actual = convertMarkdown(markdown);
-  //   expect(actual).toBe(expected);
-  // });
+  test("converts images correctly", () => {
+    const markdown = "![Alt text](https://example.com/image.png)";
+    const expected =
+      '<p><img src="https://example.com/image.png" alt="Alt text"></p>';
+    const actual = convertMarkdown(markdown);
+    expect(normalizeHTML(actual)).toBe(normalizeHTML(expected));
+  });
 
   // Test unsupported attributes
   test("removes unsupported attributes", () => {

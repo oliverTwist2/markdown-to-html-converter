@@ -1,6 +1,10 @@
 const marked = require("marked");
 const sanitizeHTML = require("sanitize-html");
 
+function escapeHTML(str) {
+  return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+}
+
 function convertMarkdown(markdown) {
   if (typeof markdown !== "string") {
     throw new Error(
@@ -12,6 +16,11 @@ function convertMarkdown(markdown) {
   try {
     // Convert Markdown to HTML
     const html = marked.parse(markdown);
+
+    // If the result is empty and the input contains only HTML, escape it
+    if (!html.trim() && /<.*?>/.test(markdown)) {
+      return escapeHTML(markdown);
+    }
 
     // Sanitize the HTML to prevent XSS attacks
     const sanitizedHtml = sanitizeHTML(html, {
@@ -53,6 +62,11 @@ function convertMarkdown(markdown) {
         img: ["src", "alt"],
       },
     });
+
+    // If sanitizer stripped everything, and input was raw HTML, escape it
+    if (!sanitizedHtml.trim() && /<.*?>/.test(markdown)) {
+      return escapeHTML(markdown);
+    }
 
     return sanitizedHtml;
   } catch (error) {
